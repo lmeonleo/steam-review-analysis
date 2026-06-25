@@ -1,8 +1,8 @@
 """Interactive bonus dashboard for the Steam Review Analysis project.
 
-The dashboard intentionally uses Streamlit's built-in chart elements instead of
-Altair directly. This keeps the public cloud deployment lightweight and avoids
-Python-version compatibility surprises on Streamlit Community Cloud.
+This app reads pre-aggregated result files produced by the analysis pipeline.
+It avoids direct Altair imports so the public Streamlit deployment stays stable
+across Streamlit Community Cloud runtime changes.
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ ROOT = Path(__file__).resolve().parents[1]
 RESULTS = ROOT / "output/results/local"
 
 
-@st.cache_data
 def load_data():
     summary = json.loads((RESULTS / "summary.json").read_text(encoding="utf-8"))
     metadata = json.loads((ROOT / "project_metadata.json").read_text(encoding="utf-8"))
@@ -31,9 +30,21 @@ def load_data():
 
 st.set_page_config(page_title="Steam Review Analysis", page_icon="🎮", layout="wide")
 summary, metadata, data = load_data()
+members_text = " / ".join(metadata["members"])
 
 st.title("Steam Review Analysis")
-st.caption(f"{metadata['team_name']} · {' & '.join(metadata['members'])} · Big Data Final Project")
+st.markdown(
+    f"""
+    <div style="padding: 0.6rem 0 1.2rem 0; color: #5f6b7a; font-size: 1.05rem;">
+      <b>Team:</b> {metadata["team_name"]}
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <b>Members:</b> {members_text}
+      &nbsp;&nbsp;|&nbsp;&nbsp;
+      <b>Course:</b> Big Data Final Project
+    </div>
+    """,
+    unsafe_allow_html=True,
+)
 
 c1, c2, c3, c4 = st.columns(4)
 c1.metric("Games", f"{summary['clean_rows']:,}")
