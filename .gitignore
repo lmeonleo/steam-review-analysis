@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.streamlit/secrets.toml
+
+# Raw Kaggle files are documented in the report, but not needed by the public dashboard.
+data/raw/
+
+# Temporary and packaged artifacts.
+tmp/
+output/*.zip

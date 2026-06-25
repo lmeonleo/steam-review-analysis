@@ -1,0 +1,2 @@
+raw_rows,clean_rows,distinct_appids,duplicate_appids_removed,missing_release_date_before,missing_release_date_after,missing_price_after,zero_review_games,total_positive_ratings,total_negative_ratings,overall_weighted_positive_pct,median_game_rating_pct,median_reviews_per_game
+27075,27075,27075,0,0,0,0,0,27090122,5713560,82.58,76.03,36

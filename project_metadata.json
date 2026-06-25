@@ -1,0 +1,10 @@
+{
+  "team_name": "Steam Insight Lab",
+  "members": ["Student 1", "Student 2"],
+  "roles": [
+    "Student 1: HDFS ingestion, PySpark ETL, data quality validation",
+    "Student 2: Spark SQL analysis, visualization, interpretation and report"
+  ],
+  "course": "Big Data",
+  "submission_date": "2026-06-24"
+}

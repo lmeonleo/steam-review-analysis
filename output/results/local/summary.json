@@ -1,0 +1,15 @@
+{
+  "raw_rows": 27075,
+  "clean_rows": 27075,
+  "distinct_appids": 27075,
+  "duplicate_appids_removed": 0,
+  "missing_release_date_before": 0,
+  "missing_release_date_after": 0,
+  "missing_price_after": 0,
+  "zero_review_games": 0,
+  "total_positive_ratings": 27090122,
+  "total_negative_ratings": 5713560,
+  "overall_weighted_positive_pct": 82.58,
+  "median_game_rating_pct": 76.03,
+  "median_reviews_per_game": 36
+}
