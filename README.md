@@ -57,13 +57,16 @@ second implementation for transparent result checking and PDF generation.
 ## Optional dashboard
 
 ```powershell
-pip install -r requirements-dashboard.txt
+pip install -r requirements.txt
 streamlit run dashboard/app.py
 ```
 
 The dashboard reads only pre-aggregated result files, so it starts quickly and
 does not move raw data into a web process. Deploy it to Streamlit Community
 Cloud or the course server if an accessible URL is required for bonus credit.
+For Streamlit Community Cloud, keep `dashboard/app.py` as the main file path;
+the cloud build uses the lightweight root `requirements.txt`. Spark/Hadoop
+execution dependencies are kept separately in `requirements-spark.txt`.
 
 ## Team metadata
 
