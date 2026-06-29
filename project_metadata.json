@@ -1,9 +1,10 @@
 {
   "team_name": "Steam Insight Lab",
-  "members": ["高明敏", "宋品其"],
+  "members": [
+    "高明敏"
+  ],
   "roles": [
-    "高明敏: HDFS ingestion, PySpark ETL, data quality validation",
-    "宋品其: Spark SQL analysis, visualization, interpretation and report"
+    "高明敏: HDFS ingestion, PySpark ETL, Spark SQL analysis, visualization, interpretation, report and dashboard"
   ],
   "course": "Big Data",
   "submission_date": "2026-06-24"
