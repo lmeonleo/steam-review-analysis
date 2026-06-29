@@ -21,7 +21,7 @@ TEMPLATE = Path(
     r"C:\Users\hp\xwechat_files\wxid_owx3mootag1922_1a09\msg\file\2026-06\Final Report Template.docx"
 )
 OUT_DIR = ROOT / "output" / "docx"
-OUT_DOCX = OUT_DIR / "Steam_Review_Analysis_Final_Report_Revised.docx"
+OUT_DOCX = OUT_DIR / "Steam_Review_Analysis_Final_Report_Formatted.docx"
 RESULTS = ROOT / "output" / "results" / "local"
 FIGURES = ROOT / "output" / "figures"
 TMP = ROOT / "tmp"
@@ -253,6 +253,13 @@ def fill_cover(doc: Document, metadata: dict) -> None:
             for field, value in values.items():
                 if field in key:
                     row.cells[1].text = value
+        # The template uses underline-like fields. Center all visible content in
+        # this information block so the cover looks balanced after filling.
+        for row in table.rows:
+            for cell in row.cells:
+                cell.vertical_alignment = WD_CELL_VERTICAL_ALIGNMENT.CENTER
+                for para in cell.paragraphs:
+                    para.alignment = WD_ALIGN_PARAGRAPH.CENTER
 
 
 def build() -> None:
@@ -314,6 +321,16 @@ def build() -> None:
         "outcomes per game is 36, indicating a long-tail catalogue in which a small number "
         "of games receive very high attention.",
     )
+    add_paragraph(
+        doc,
+        "Two source files are used most heavily in the analysis. The first is steam.csv, "
+        "which acts as the main game-level fact table and contains release date, price, "
+        "platform, genre, publisher, and positive/negative rating counts. The second is "
+        "steamspy_tag_data.csv, which stores tag vote counts in a wide format and is "
+        "normalized into a tag-level analytical table. Other raw files are retained as part "
+        "of the dataset package, but the core questions can be answered from these two "
+        "tables with a clear and reproducible pipeline.",
+    )
 
     add_heading(doc, "2. HDFS Storage and Access Strategy", 1)
     add_paragraph(
@@ -323,6 +340,15 @@ def build() -> None:
         "modification, cleaned game records are written as partitioned Parquet, and final "
         "analysis outputs are materialized as compact CSV result tables for reporting and "
         "the dashboard.",
+    )
+    add_paragraph(
+        doc,
+        "This layout follows a common big-data lake pattern. The raw zone is append-only, "
+        "which protects the original Kaggle files and makes it possible to audit every "
+        "transformation. The curated zone stores typed and cleaned Parquet records, improving "
+        "I/O efficiency compared with repeatedly scanning CSV. The result zone contains only "
+        "small aggregates, so downstream visualization does not need to reprocess the full "
+        "dataset.",
     )
     add_small_table(
         doc,
@@ -355,6 +381,25 @@ def build() -> None:
             "Write curated records to Parquet and run Spark SQL aggregations.",
         ],
     )
+    add_paragraph(
+        doc,
+        "A local Pandas-based verification script is also included. It is not used as a "
+        "replacement for the PySpark pipeline; instead, it independently recomputes the "
+        "reported aggregates on a machine without Hadoop. Matching results between the "
+        "local verification output and the Spark design increases confidence that the "
+        "business logic is correct.",
+    )
+    add_small_table(
+        doc,
+        ["Quality check", "Result", "Interpretation"],
+        [
+            ["Primary key", "27,075 unique games", "No duplicate game rows after cleaning"],
+            ["Review fields", "32.8M outcomes", "Positive and negative counts are numeric and non-negative"],
+            ["Release year", "1997-2019", "2019 is treated as an incomplete snapshot year"],
+            ["Ranking eligibility", ">= 1,000 reviews", "Small samples are excluded from reliable top-game ranking"],
+        ],
+        [1.55, 1.55, 2.9],
+    )
 
     add_heading(doc, "4. Analytical Questions and Methods", 1)
     add_bullets(
@@ -374,6 +419,26 @@ def build() -> None:
         "than raw positive rate alone, because a game with 3 positive reviews out of 3 "
         "should not outrank a game with hundreds of thousands of highly positive reviews.",
     )
+    add_paragraph(
+        doc,
+        "The main analytical measures are total review outcomes, raw positive percentage, "
+        "mean genre-level rating, median review attention, and Wilson lower-bound score. "
+        "Together these measures separate popularity from reliability: review volume "
+        "captures attention, while the Wilson score provides a conservative estimate of "
+        "user satisfaction when sample sizes differ strongly across games.",
+    )
+    add_small_table(
+        doc,
+        ["Question", "Method", "Output"],
+        [
+            ["Catalogue growth", "Group by release_year", "yearly.csv and market evolution figure"],
+            ["Genre reception", "Explode genres, aggregate rating and Wilson metrics", "genre.csv"],
+            ["Price association", "Bucket numeric prices into bands", "price_band.csv"],
+            ["Reliable ranking", "Filter by review volume and sort by Wilson bound", "top_reliable.csv"],
+            ["Tag attention", "Unpivot SteamSpy tag columns", "top_tags.csv"],
+        ],
+        [1.6, 2.55, 1.85],
+    )
 
     add_heading(doc, "5. Key Findings and Visualizations", 1)
     add_heading(doc, "5.1 Catalogue Growth", 2)
@@ -384,6 +449,14 @@ def build() -> None:
         "a relatively stable band, suggesting that the platform's growth reflects market "
         "expansion rather than a simple collapse in average user satisfaction.",
     )
+    add_paragraph(
+        doc,
+        "This pattern is important for interpretation. If catalogue growth were accompanied "
+        "by a dramatic fall in average ratings, it would suggest that easier publishing "
+        "reduced observed quality. Instead, the result is more nuanced: the catalogue grows "
+        "quickly, while rating averages move within a moderate range. The platform therefore "
+        "appears to become broader and more diverse rather than simply worse.",
+    )
     add_figure(doc, FIGURES / "01_market_evolution.png", "Figure 1. Steam catalogue growth and rating trend by release year.")
 
     add_heading(doc, "5.2 Genre-Level Reception", 2)
@@ -392,6 +465,13 @@ def build() -> None:
         "Genre analysis shows that genre labels overlap substantially, so one game can "
         "contribute to multiple categories. Wilson-adjusted genre scores make the comparison "
         "more conservative by considering both rating level and sample reliability.",
+    )
+    add_paragraph(
+        doc,
+        "Because many Steam games are tagged with multiple genres, genre-level results "
+        "should be read as overlapping market segments rather than mutually exclusive "
+        "categories. This is why the report emphasizes relative patterns and reliable "
+        "reception instead of treating genres as isolated groups.",
     )
     add_figure(doc, FIGURES / "02_genre_quality.png", "Figure 2. Genre coverage and Wilson-adjusted reception.")
 
@@ -418,6 +498,14 @@ def build() -> None:
         "tend to receive more review attention than very low-priced games, while free games "
         "show broad catalogue coverage and high median review counts.",
     )
+    add_paragraph(
+        doc,
+        "The price analysis does not prove that price causes higher or lower satisfaction. "
+        "Different price bands may also differ by marketing budget, production quality, "
+        "genre mix, and release strategy. However, the comparison is still useful because "
+        "it shows how review attention and user reception are distributed across commercial "
+        "segments of the Steam catalogue.",
+    )
     add_figure(doc, FIGURES / "03_price_bands.png", "Figure 3. Rating level and review attention by price band.")
     add_small_table(
         doc,
@@ -442,6 +530,13 @@ def build() -> None:
         f"The highest-ranked game by Wilson lower bound is {best['name']}. This confirms "
         "that the ranking is not simply rewarding small-sample perfect scores; it favours "
         "games with both strong reception and sufficient review volume.",
+    )
+    add_paragraph(
+        doc,
+        "This ranking is more suitable for recommendation-style interpretation than a raw "
+        "positive-rate ranking. A plain percentage can be unstable when a game has very few "
+        "reviews, while the Wilson lower bound penalizes uncertainty and rewards consistent "
+        "performance at scale.",
     )
     add_figure(doc, FIGURES / "04_top_reliable.png", "Figure 4. Most reliable highly rated games by Wilson lower bound.")
     add_small_table(
@@ -505,6 +600,14 @@ def build() -> None:
         "application lightweight while preserving the full big-data workflow behind the "
         "analysis. Public URL: https://steam-review-analysis-lmeonleo.streamlit.app/.",
     )
+    add_paragraph(
+        doc,
+        "The dashboard is designed as a demonstration layer rather than the primary "
+        "processing engine. It exposes the final aggregates through interactive tabs for "
+        "market growth, genres, price bands, rankings, and methodology. This separation "
+        "keeps the web application fast while making the HDFS/PySpark/Spark SQL workflow "
+        "clear to evaluators.",
+    )
 
     add_heading(doc, "7. Conclusion and Reflection", 1)
     add_paragraph(
@@ -517,25 +620,33 @@ def build() -> None:
         "than individual review texts, so sentiment analysis of written review content is "
         "outside the scope of this project.",
     )
+    add_paragraph(
+        doc,
+        "Future work could extend the analysis in three directions. First, a larger review-text "
+        "dataset could support NLP sentiment modeling and topic extraction. Second, joining "
+        "Steam data with external sales or player-count data would help distinguish attention "
+        "from commercial success. Third, a scheduled pipeline could refresh the dashboard "
+        "automatically when new catalogue snapshots become available.",
+    )
 
     add_heading(doc, "8. Team Roles", 1)
     add_small_table(
         doc,
         ["Member", "Main responsibilities"],
         [
-            ["\u9ad8\u660e\u654f", "HDFS ingestion, PySpark ETL design, Spark SQL analysis, visualization, interpretation, report and dashboard"],
+            ["Gao Mingmin", "HDFS ingestion, PySpark ETL design, Spark SQL analysis, visualization, interpretation, report and dashboard"],
         ],
         [1.35, 4.65],
     )
 
     add_heading(doc, "References", 1)
-    add_bullets(
+    add_numbered(
         doc,
         [
-            "Nik Davis. Steam Store Games. Kaggle. https://www.kaggle.com/datasets/nikdavis/steam-store-games/data",
-            "Apache Spark documentation. https://spark.apache.org/docs/latest/",
-            "Apache Hadoop HDFS documentation. https://hadoop.apache.org/docs/",
-            "Streamlit documentation. https://docs.streamlit.io/",
+            "Davis, N. Steam Store Games [Dataset]. Kaggle. https://www.kaggle.com/datasets/nikdavis/steam-store-games/data",
+            "Apache Software Foundation. Apache Spark Documentation. https://spark.apache.org/docs/latest/",
+            "Apache Software Foundation. Apache Hadoop HDFS Documentation. https://hadoop.apache.org/docs/",
+            "Streamlit. Streamlit Documentation. https://docs.streamlit.io/",
         ],
     )
 

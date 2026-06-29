@@ -9,3 +9,5 @@ data/raw/
 # Temporary and packaged artifacts.
 tmp/
 output/*.zip
+~$*.docx
+output/docx/~$*.docx

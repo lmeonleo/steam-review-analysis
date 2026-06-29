@@ -1,10 +1,10 @@
 {
   "team_name": "Steam Insight Lab",
   "members": [
-    "高明敏"
+    "Gao Mingmin"
   ],
   "roles": [
-    "高明敏: HDFS ingestion, PySpark ETL, Spark SQL analysis, visualization, interpretation, report and dashboard"
+    "Gao Mingmin: HDFS ingestion, PySpark ETL, Spark SQL analysis, visualization, interpretation, report and dashboard"
   ],
   "course": "Big Data",
   "submission_date": "2026-06-24"
