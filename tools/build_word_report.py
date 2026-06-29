@@ -21,7 +21,7 @@ TEMPLATE = Path(
     r"C:\Users\hp\xwechat_files\wxid_owx3mootag1922_1a09\msg\file\2026-06\Final Report Template.docx"
 )
 OUT_DIR = ROOT / "output" / "docx"
-OUT_DOCX = OUT_DIR / "Steam_Review_Analysis_Final_Report_Formatted.docx"
+OUT_DOCX = OUT_DIR / "Steam_Review_Analysis_Final_Report_LargeFont.docx"
 RESULTS = ROOT / "output" / "results" / "local"
 FIGURES = ROOT / "output" / "figures"
 TMP = ROOT / "tmp"
@@ -50,7 +50,7 @@ def set_cell_text(cell, text: str, bold: bool = False, color: RGBColor | None = 
     run = p.add_run(text)
     run.font.name = "Calibri"
     run._element.rPr.rFonts.set(qn("w:eastAsia"), "Microsoft YaHei")
-    run.font.size = Pt(10)
+    run.font.size = Pt(10.5)
     run.bold = bold
     if color:
         run.font.color.rgb = color
@@ -147,7 +147,7 @@ def add_heading(doc: Document, text: str, level: int = 1) -> None:
     run = p.add_run(text)
     run.font.name = "Calibri"
     run._element.rPr.rFonts.set(qn("w:eastAsia"), "Microsoft YaHei")
-    run.font.size = Pt(15 if level == 1 else 12.5)
+    run.font.size = Pt(16 if level == 1 else 13.5)
     run.font.color.rgb = ACCENT if level <= 2 else DARK
     run.bold = True
 
@@ -156,7 +156,7 @@ def add_caption(doc: Document, text: str) -> None:
     p.alignment = WD_ALIGN_PARAGRAPH.CENTER
     run = p.add_run(text)
     run.italic = True
-    run.font.size = Pt(9)
+    run.font.size = Pt(9.5)
     run.font.color.rgb = MUTED
 
 
@@ -196,7 +196,7 @@ def setup_styles(doc: Document) -> None:
     normal = styles["Normal"]
     normal.font.name = "Calibri"
     normal._element.rPr.rFonts.set(qn("w:eastAsia"), "Microsoft YaHei")
-    normal.font.size = Pt(10.5)
+    normal.font.size = Pt(11.5)
     normal.font.color.rgb = DARK
     normal.paragraph_format.space_after = Pt(6)
     normal.paragraph_format.line_spacing = 1.12
@@ -205,7 +205,7 @@ def setup_styles(doc: Document) -> None:
         style = styles[name]
         style.font.name = "Calibri"
         style._element.rPr.rFonts.set(qn("w:eastAsia"), "Microsoft YaHei")
-        style.font.size = Pt(size)
+        style.font.size = Pt(size + 1)
         style.font.bold = True
         style.font.color.rgb = ACCENT if name != "Heading 3" else DARK
         style.paragraph_format.space_before = Pt(12 if name == "Heading 1" else 8)
